@@ -195,7 +195,7 @@ function Materials(){
 
         </div>
 
-        <p className="text-xs text-gray-500 mt-3">
+        <p className="text-xs text-gray-500 mt-3 italic">
           * Format file yang didukung: PDF, DOCX, TXT (Maksimal 25MB)
         </p>
 
