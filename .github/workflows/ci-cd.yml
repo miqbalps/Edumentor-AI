@@ -113,6 +113,23 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           script: |
+            # Wait for cloud-init (user_data) to finish installing system dependencies
+            echo "Waiting for VM initialization (cloud-init)..."
+            while [ ! -f /var/lib/cloud/instance/boot-finished ]; do
+              sleep 5
+            done
+            echo "VM initialized!"
+
+            # Fail-safe: Ensure Docker and Docker Compose V2 are installed
+            if ! command -v docker &> /dev/null || ! docker compose version &> /dev/null; then
+              echo "Installing Docker and Docker Compose V2..."
+              sudo apt-get update
+              sudo apt-get install -y docker.io docker-compose-v2
+              sudo systemctl start docker
+              sudo systemctl enable docker
+              sudo usermod -aG docker ubuntu
+            fi
+
             # Pull down latest code
             if [ ! -d "/var/www/edumentor-ai/.git" ]; then
               git clone https://github.com/${{ github.repository }} /var/www/edumentor-ai
@@ -126,14 +143,14 @@ jobs:
             BACKEND_PRIVATE_IP=${{ secrets.BACKEND_PRIVATE_IP }}
             EOF
 
-            # Login to Docker registry
-            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            # Login to Docker registry securely
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
             # Pull latest frontend image
-            docker-compose -f docker-compose.prod.yml pull frontend
+            docker compose -f docker-compose.frontend.yml pull
 
             # Re-create and restart frontend service
-            docker-compose -f docker-compose.prod.yml up -d --remove-orphans frontend
+            docker compose -f docker-compose.frontend.yml up -d --remove-orphans
 
             # Verify system health
             docker ps
@@ -152,6 +169,23 @@ jobs:
           proxy_username: ${{ secrets.SERVER_USER }}
           proxy_key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            # Wait for cloud-init (user_data) to finish installing system dependencies
+            echo "Waiting for VM initialization (cloud-init)..."
+            while [ ! -f /var/lib/cloud/instance/boot-finished ]; do
+              sleep 5
+            done
+            echo "VM initialized!"
+
+            # Fail-safe: Ensure Docker and Docker Compose V2 are installed
+            if ! command -v docker &> /dev/null || ! docker compose version &> /dev/null; then
+              echo "Installing Docker and Docker Compose V2..."
+              sudo apt-get update
+              sudo apt-get install -y docker.io docker-compose-v2
+              sudo systemctl start docker
+              sudo systemctl enable docker
+              sudo usermod -aG docker ubuntu
+            fi
+
             # Pull down latest code
             if [ ! -d "/var/www/edumentor-ai/.git" ]; then
               git clone https://github.com/${{ github.repository }} /var/www/edumentor-ai
@@ -177,14 +211,14 @@ jobs:
             R2_PUBLIC_URL=${{ secrets.R2_PUBLIC_URL }}
             EOF
 
-            # Login to Docker registry
-            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            # Login to Docker registry securely
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
             # Pull latest backend image
-            docker-compose -f docker-compose.prod.yml pull backend
+            docker compose -f docker-compose.backend.yml pull
 
             # Re-create and restart backend service
-            docker-compose -f docker-compose.prod.yml up -d --remove-orphans backend
+            docker compose -f docker-compose.backend.yml up -d --remove-orphans
 
             # Verify system health
             docker ps

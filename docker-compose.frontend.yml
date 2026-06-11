@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  # Frontend App Service (React served via Nginx)
+  frontend:
+    image: ${DOCKERHUB_USERNAME}/edumentor-frontend:latest
+    container_name: edumentor-frontend
+    restart: always
+    ports:
+      - "80:80" # Access app via standard HTTP port 80
+    extra_hosts:
+      - "backend:${BACKEND_PRIVATE_IP}" # Map backend domain to private IP of Backend VM
+    networks:
+      - edumentor_network
+
+networks:
+  edumentor_network:
+    driver: bridge
