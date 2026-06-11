@@ -444,7 +444,7 @@ resource "aws_instance" "frontend_vm" {
   user_data = <<-EOF
               #!/bin/bash
               sudo apt-get update
-              sudo apt-get install -y docker.io docker-compose
+              sudo apt-get install -y docker.io docker-compose-v2
               sudo systemctl start docker
               sudo systemctl enable docker
               sudo usermod -aG docker ubuntu
@@ -468,7 +468,7 @@ resource "aws_instance" "backend_vm" {
   user_data = <<-EOF
               #!/bin/bash
               sudo apt-get update
-              sudo apt-get install -y docker.io docker-compose
+              sudo apt-get install -y docker.io docker-compose-v2
               sudo systemctl start docker
               sudo systemctl enable docker
               sudo usermod -aG docker ubuntu
