@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Frontend App Service (React served via Nginx)
   frontend:

@@ -144,16 +144,20 @@ jobs:
             EOF
 
             # Login to Docker registry securely
-            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | sudo docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+            # Clean up any conflicting containers
+            sudo docker rm -f edumentor-frontend || true
+            sudo docker rm -f $$(sudo docker ps -a -q --filter name=frontend) || true
 
             # Pull latest frontend image
-            docker compose -f docker-compose.frontend.yml pull
+            sudo docker compose -f docker-compose.frontend.yml pull
 
             # Re-create and restart frontend service
-            docker compose -f docker-compose.frontend.yml up -d --remove-orphans
+            sudo docker compose -f docker-compose.frontend.yml up -d --remove-orphans
 
             # Verify system health
-            docker ps
+            sudo docker ps
             echo "EduMentor AI Frontend deployed successfully!"
 
       # Step 3.2: Deploy Backend container to Backend Private VM (via SSH Proxy)
@@ -212,14 +216,18 @@ jobs:
             EOF
 
             # Login to Docker registry securely
-            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | sudo docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+            # Clean up any conflicting containers
+            sudo docker rm -f edumentor-backend || true
+            sudo docker rm -f $$(sudo docker ps -a -q --filter name=backend) || true
 
             # Pull latest backend image
-            docker compose -f docker-compose.backend.yml pull
+            sudo docker compose -f docker-compose.backend.yml pull
 
             # Re-create and restart backend service
-            docker compose -f docker-compose.backend.yml up -d --remove-orphans
+            sudo docker compose -f docker-compose.backend.yml up -d --remove-orphans
 
             # Verify system health
-            docker ps
+            sudo docker ps
             echo "EduMentor AI Backend deployed successfully!"
