@@ -148,7 +148,7 @@ jobs:
 
             # Clean up any conflicting containers
             sudo docker rm -f edumentor-frontend || true
-            sudo docker rm -f $$(sudo docker ps -a -q --filter name=frontend) || true
+            sudo docker ps -a -q --filter name=frontend | xargs -r sudo docker rm -f || true
 
             # Pull latest frontend image
             sudo docker compose -f docker-compose.frontend.yml pull
@@ -220,7 +220,7 @@ jobs:
 
             # Clean up any conflicting containers
             sudo docker rm -f edumentor-backend || true
-            sudo docker rm -f $$(sudo docker ps -a -q --filter name=backend) || true
+            sudo docker ps -a -q --filter name=backend | xargs -r sudo docker rm -f || true
 
             # Pull latest backend image
             sudo docker compose -f docker-compose.backend.yml pull
