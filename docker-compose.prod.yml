@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # 1. Frontend App Service (React served via Nginx)
+  frontend:
+    image: ${DOCKERHUB_USERNAME}/edumentor-frontend:latest
+    container_name: edumentor-frontend
+    restart: always
+    ports:
+      - "80:80" # Access app via standard HTTP port 80
+    extra_hosts:
+      - "backend:${BACKEND_PRIVATE_IP}" # Map backend domain to private IP of Backend VM
+    networks:
+      - edumentor_network
+
+  # 2. Backend API Service (Node.js API)
+  backend:
+    image: ${DOCKERHUB_USERNAME}/edumentor-backend:latest
+    container_name: edumentor-backend
+    restart: always
+    environment:
+      - PORT=5000
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - R2_ACCOUNT_ID=${R2_ACCOUNT_ID}
+      - R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}
+      - R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
+      - R2_BUCKET_NAME=${R2_BUCKET_NAME}
+      - R2_PUBLIC_URL=${R2_PUBLIC_URL}
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend/uploads:/usr/src/app/uploads
+    networks:
+      - edumentor_network
+
+networks:
+  edumentor_network:
+    driver: bridge

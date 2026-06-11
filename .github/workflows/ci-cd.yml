@@ -104,7 +104,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
-      - name: Deploy to Cloud VM Server via SSH
+      # Step 3.1: Deploy Frontend container to Frontend Public VM
+      - name: Deploy Frontend to Public VM Server via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -119,8 +120,48 @@ jobs:
             cd /var/www/edumentor-ai
             git pull origin main
 
-            # Generate root .env file from GitHub Secrets dynamically for Docker Compose
+            # Generate root .env file for Frontend (needs DOCKERHUB_USERNAME and BACKEND_PRIVATE_IP)
             cat <<EOF > .env
+            DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            BACKEND_PRIVATE_IP=${{ secrets.BACKEND_PRIVATE_IP }}
+            EOF
+
+            # Login to Docker registry
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+
+            # Pull latest frontend image
+            docker-compose -f docker-compose.prod.yml pull frontend
+
+            # Re-create and restart frontend service
+            docker-compose -f docker-compose.prod.yml up -d --remove-orphans frontend
+
+            # Verify system health
+            docker ps
+            echo "EduMentor AI Frontend deployed successfully!"
+
+      # Step 3.2: Deploy Backend container to Backend Private VM (via SSH Proxy)
+      - name: Deploy Backend to Private VM Server via SSH Proxy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.BACKEND_PRIVATE_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          proxy_host: ${{ secrets.SERVER_HOST }}
+          proxy_port: 22
+          proxy_username: ${{ secrets.SERVER_USER }}
+          proxy_key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            # Pull down latest code
+            if [ ! -d "/var/www/edumentor-ai/.git" ]; then
+              git clone https://github.com/${{ github.repository }} /var/www/edumentor-ai
+            fi
+            cd /var/www/edumentor-ai
+            git pull origin main
+
+            # Generate root .env file from GitHub Secrets dynamically for Backend Docker Compose
+            cat <<EOF > .env
+            DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
             PORT=5000
             DB_HOST=${{ secrets.DB_HOST }}
             DB_PORT=${{ secrets.DB_PORT }}
@@ -139,12 +180,12 @@ jobs:
             # Login to Docker registry
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
 
-            # Pull latest images
-            docker-compose pull
+            # Pull latest backend image
+            docker-compose -f docker-compose.prod.yml pull backend
 
-            # Re-create and restart container services
-            docker-compose up -d --remove-orphans
+            # Re-create and restart backend service
+            docker-compose -f docker-compose.prod.yml up -d --remove-orphans backend
 
             # Verify system health
             docker ps
-            echo "EduMentor AI system deployed successfully!"
+            echo "EduMentor AI Backend deployed successfully!"
