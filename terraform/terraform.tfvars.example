@@ -1,0 +1,29 @@
+# =========================================================================
+# TEMPLATE TERRAFORM VARIABLES (CONTOH KONFIGURASI)
+# Salin berkas ini ke "terraform.tfvars" dan sesuaikan isinya sebelum menjalankan terraform apply.
+# =========================================================================
+
+# 1. AWS Configuration (Opsional - default sudah diatur)
+# aws_region           = "ap-southeast-2"
+# vpc_cidr             = "10.0.0.0/16"
+# vm_instance_type     = "t3.micro"
+aws_access_key       = "SalinAWSAccessKeyIDDisini"
+aws_secret_key       = "SalinAWSSecretAccessKeyDisini"
+aws_session_token    = "SalinAWSSessionTokenDisiniJikaMenggunakanAWSAcademy"
+ssh_key_name         = "NamaKeypairAWSAnda"
+
+# 2. Database RDS MySQL Credentials (Wajib Diisi)
+db_password          = "KombinasiPasswordRahasianya123!"
+db_name              = "edumentor"
+db_user              = "root"
+db_instance_class    = "db.t3.micro"
+db_allocated_storage = 20
+
+# 3. Cloudflare & R2 Credentials (Wajib Diisi)
+cloudflare_api_token  = "SalinTokenAPICloudflareDisini"
+cloudflare_account_id = "SalinCloudflareAccountIDDisini"
+cloudflare_zone_name  = "edumentor.ai"             # Nama domain utama yang terdaftar di Cloudflare
+
+# 4. Domain & CDN Setup (Wajib Diisi)
+app_domain            = "edumentor.ai"              # Ganti dengan domain utama aplikasi Anda
+storage_domain        = "materials.edumentor.ai"    # Ganti dengan subdomain penyimpanan R2
