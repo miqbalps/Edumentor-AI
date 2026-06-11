@@ -119,8 +119,8 @@ jobs:
             cd /var/www/edumentor-ai
             git pull origin main
 
-            # Generate backend .env file from GitHub Secrets dynamically
-            cat <<EOF > backend/.env
+            # Generate root .env file from GitHub Secrets dynamically for Docker Compose
+            cat <<EOF > .env
             PORT=5000
             DB_HOST=${{ secrets.DB_HOST }}
             DB_PORT=${{ secrets.DB_PORT }}
