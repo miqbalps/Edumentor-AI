@@ -12,7 +12,15 @@ function QuizHistory(){
   const [loadingReview, setLoadingReview] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [toast, setToast] = useState(null);
   const itemsPerPage = 5;
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(null);
+    }, 3000);
+  };
 
   const handleDeleteAttempt = async (e, attemptId) => {
     e.stopPropagation();
@@ -29,7 +37,7 @@ function QuizHistory(){
       }
     } catch (error) {
       console.error(error);
-      alert("Gagal menghapus riwayat kuis");
+      showToast("Gagal menghapus riwayat kuis", "error");
     }
   };
 
@@ -89,7 +97,7 @@ function QuizHistory(){
       setReviewData(res.data);
     } catch (error) {
       console.error(error);
-      alert("Gagal memuat detail kuis");
+      showToast("Gagal memuat detail kuis", "error");
       setSelectedQuizId(null);
     } finally {
       setLoadingReview(false);
@@ -353,6 +361,22 @@ function QuizHistory(){
             </div>
 
           </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed top-20 right-8 z-50 flex items-center gap-3 border px-5 py-3.5 rounded-lg shadow-lg animate-in slide-in-from-top-4 duration-300 ${
+          toast.type === 'success'
+            ? 'bg-green-50 border-green-200 text-green-800 shadow-green-100/50'
+            : 'bg-red-50 border-red-200 text-red-800 shadow-red-100/50'
+        }`}>
+          <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+            toast.type === 'success'
+              ? 'bg-green-500 animate-pulse'
+              : 'bg-red-500 animate-pulse'
+          }`} />
+          <span className="font-bold text-sm tracking-wide">{toast.message}</span>
         </div>
       )}
 

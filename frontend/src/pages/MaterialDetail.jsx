@@ -47,7 +47,7 @@ function MaterialDetail(){
 
   const handleSaveTitle = async () => {
     if (!tempTitle || !tempTitle.trim()) {
-      alert("Judul materi tidak boleh kosong");
+      showToast("Judul materi tidak boleh kosong", "error");
       return;
     }
     try {

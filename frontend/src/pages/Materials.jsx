@@ -12,7 +12,15 @@ function Materials(){
   const [loading,setLoading]=useState(true);
   const [uploading,setUploading]=useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [toast, setToast] = useState(null);
   const itemsPerPage = 6;
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(null);
+    }, 3000);
+  };
 
   const handleDeleteMaterial = async (id, title) => {
     if (!window.confirm(`Apakah Anda yakin ingin menghapus materi "${title}"? Tindakan ini juga akan menghapus seluruh modul, kuis, dan data riwayat terkait.`)) {
@@ -29,7 +37,7 @@ function Materials(){
       }
     } catch (error) {
       console.error(error);
-      alert("Gagal menghapus materi");
+      showToast("Gagal menghapus materi", "error");
     }
   };
 
@@ -88,6 +96,11 @@ function Materials(){
       return;
     }
 
+    if(file.size > 25 * 1024 * 1024){
+      showToast("Ukuran file melebihi batas maksimal 25 MB", "error");
+      return;
+    }
+
     try{
 
       setUploading(true);
@@ -115,9 +128,10 @@ function Materials(){
 
       console.error(error);
 
-      alert(
+      showToast(
         error.response?.data?.message||
-        "Upload gagal"
+        "Upload gagal",
+        "error"
       );
 
     }finally{
@@ -181,6 +195,10 @@ function Materials(){
 
         </div>
 
+        <p className="text-xs text-gray-500 mt-3">
+          * Format file yang didukung: PDF, DOCX, TXT (Maksimal 25MB)
+        </p>
+
       </form>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -214,6 +232,22 @@ function Materials(){
           >
             Selanjutnya
           </button>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed top-20 right-8 z-50 flex items-center gap-3 border px-5 py-3.5 rounded-lg shadow-lg animate-in slide-in-from-top-4 duration-300 ${
+          toast.type === 'success'
+            ? 'bg-green-50 border-green-200 text-green-800 shadow-green-100/50'
+            : 'bg-red-50 border-red-200 text-red-800 shadow-red-100/50'
+        }`}>
+          <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+            toast.type === 'success'
+              ? 'bg-green-500 animate-pulse'
+              : 'bg-red-500 animate-pulse'
+          }`} />
+          <span className="font-bold text-sm tracking-wide">{toast.message}</span>
         </div>
       )}
 

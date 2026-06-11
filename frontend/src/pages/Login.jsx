@@ -10,6 +10,14 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(null);
+    }, 3000);
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -39,9 +47,10 @@ function Login() {
     } catch (error) {
       console.error(error);
 
-      alert(
+      showToast(
         error.response?.data?.message ||
-        "Login gagal"
+        "Login gagal",
+        "error"
       );
     } finally {
       setLoading(false);
@@ -126,6 +135,22 @@ function Login() {
             </Link>
           </div>
         </form>
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed top-20 right-8 z-50 flex items-center gap-3 border px-5 py-3.5 rounded-lg shadow-lg animate-in slide-in-from-top-4 duration-300 ${
+          toast.type === 'success'
+            ? 'bg-green-50 border-green-200 text-green-800 shadow-green-100/50'
+            : 'bg-red-50 border-red-200 text-red-800 shadow-red-100/50'
+        }`}>
+          <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+            toast.type === 'success'
+              ? 'bg-green-500 animate-pulse'
+              : 'bg-red-500 animate-pulse'
+          }`} />
+          <span className="font-bold text-sm tracking-wide">{toast.message}</span>
+        </div>
+      )}
 
       </div>
     </div>
