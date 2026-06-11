@@ -447,6 +447,9 @@ resource "aws_instance" "frontend_vm" {
               sudo apt-get install -y docker.io docker-compose
               sudo systemctl start docker
               sudo systemctl enable docker
+              sudo usermod -aG docker ubuntu
+              sudo mkdir -p /var/www/edumentor-ai
+              sudo chown -R ubuntu:ubuntu /var/www/edumentor-ai
               EOF
 
   tags = {
@@ -468,6 +471,9 @@ resource "aws_instance" "backend_vm" {
               sudo apt-get install -y docker.io docker-compose
               sudo systemctl start docker
               sudo systemctl enable docker
+              sudo usermod -aG docker ubuntu
+              sudo mkdir -p /var/www/edumentor-ai
+              sudo chown -R ubuntu:ubuntu /var/www/edumentor-ai
               EOF
 
   tags = {

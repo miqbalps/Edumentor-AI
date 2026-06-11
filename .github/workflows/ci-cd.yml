@@ -113,7 +113,9 @@ jobs:
           port: 22
           script: |
             # Pull down latest code
-            cd /var/www/edumentor-ai || git clone https://github.com/${{ github.repository }} /var/www/edumentor-ai
+            if [ ! -d "/var/www/edumentor-ai/.git" ]; then
+              git clone https://github.com/${{ github.repository }} /var/www/edumentor-ai
+            fi
             cd /var/www/edumentor-ai
             git pull origin main
 
