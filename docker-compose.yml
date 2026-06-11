@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # 1. Database Service (MySQL)
+  mysql:
+    image: mysql:8.0
+    container_name: edumentor-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: edumentor
+    ports:
+      - "3307:3306" # Mapped to 3307 to avoid conflicts with local Laragon/MySQL on 3306
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql # Auto-initializes schema on startup
+    networks:
+      - edumentor_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. Backend API Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: edumentor-backend
+    restart: always
+    environment:
+      - PORT=5000
+      - DB_HOST=mysql # Resolves to mysql container within network
+      - DB_USER=root
+      - DB_PASSWORD=rootpassword
+      - DB_NAME=edumentor
+      - JWT_SECRET=edumentor_secret
+      - GEMINI_API_KEY=AIzaSyDjTqcmA2qR-3UN7UzuCTR0BNGTnhS1LZ4 # Use local key
+      - R2_ACCOUNT_ID=${R2_ACCOUNT_ID}
+      - R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}
+      - R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
+      - R2_BUCKET_NAME=${R2_BUCKET_NAME}
+      - R2_PUBLIC_URL=${R2_PUBLIC_URL}
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend/uploads:/usr/src/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - edumentor_network
+
+  # 3. Frontend App Service (React served via Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:5000/api # URL backend accessed by the client browser
+    container_name: edumentor-frontend
+    restart: always
+    ports:
+      - "8080:80" # Access app via http://localhost:8080
+    depends_on:
+      - backend
+    networks:
+      - edumentor_network
+
+networks:
+  edumentor_network:
+    driver: bridge
+
+volumes:
+  mysql_data:

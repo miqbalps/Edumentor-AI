@@ -1,0 +1,22 @@
+# Environment variables
+.env
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Dependency directories
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+
+# Terraform temporary/state files
+.terraform/
+**/terraform.tfvars
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+
+# OS / System files
+.DS_Store
+Thumbs.db
