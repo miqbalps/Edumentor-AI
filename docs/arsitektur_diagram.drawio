@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-06-11T19:45:00.000Z" agent="Antigravity" version="21.6.8" type="device">
+  <diagram id="edumentor-ai-arch-docker-ci-cd" name="EduMentor AI CI/CD &amp; Docker Architecture">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- CI/CD & Source Control Boundary (Left Column) -->
+        <mxCell id="ci_cd_group" value="CI/CD &amp; Pipeline (GitHub Actions)" style="swimlane;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#24292e;strokeWidth=2;fontStyle=1;align=left;spacingLeft=10;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="20" y="40" width="200" height="420" as="geometry" />
+        </mxCell>
+
+        <!-- GitHub Repository -->
+        <mxCell id="github_repo" value="&lt;b&gt;GitHub Repository&lt;/b&gt;&lt;br&gt;Source Code&lt;br&gt;(Branch: main)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECEFF1;strokeColor=#24292e;strokeWidth=2;align=center;" vertex="1" parent="ci_cd_group">
+          <mxGeometry x="20" y="40" width="160" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- GitHub Actions Runner -->
+        <mxCell id="github_actions" value="&lt;b&gt;GitHub Actions&lt;/b&gt;&lt;br&gt;Runner CI/CD Pipeline&lt;br&gt;• Job 1: Build &amp;amp; Test&lt;br&gt;• Job 2: Dockerize&lt;br&gt;• Job 3: SSH Deploy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#616161;strokeWidth=2;align=left;spacingLeft=10;" vertex="1" parent="ci_cd_group">
+          <mxGeometry x="20" y="150" width="160" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- Docker Hub Container Registry -->
+        <mxCell id="docker_hub" value="&lt;b&gt;Docker Hub&lt;/b&gt;&lt;br&gt;Container Registry&lt;br&gt;(Frontend &amp;amp; Backend)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1F5FE;strokeColor=#0288D1;strokeWidth=2;align=center;" vertex="1" parent="ci_cd_group">
+          <mxGeometry x="20" y="300" width="160" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- AWS VPC Group -->
+        <mxCell id="vpc" value="AWS VPC (10.0.0.0/16)" style="swimlane;whiteSpace=wrap;html=1;dashed=1;dashPattern=5 5;fillColor=none;strokeColor=#FF9900;strokeWidth=2;fontStyle=1;align=left;spacingLeft=10;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="260" y="280" width="720" height="520" as="geometry" />
+        </mxCell>
+        
+        <!-- Frontend Subnet Group (Public) -->
+        <mxCell id="subnet_front" value="Frontend Subnet (Public - 10.0.1.0/24)" style="swimlane;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#1E88E5;strokeWidth=1;fontStyle=1;align=left;spacingLeft=10;verticalAlign=top;" vertex="1" parent="vpc">
+          <mxGeometry x="30" y="50" width="320" height="200" as="geometry" />
+        </mxCell>
+        
+        <!-- Frontend VM EC2 -->
+        <mxCell id="vm_front" value="&lt;b&gt;Frontend VM (EC2)&lt;/b&gt;&lt;br&gt;Docker Installed" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1E88E5;strokeWidth=2;align=left;spacingLeft=10;verticalAlign=top;" vertex="1" parent="subnet_front">
+          <mxGeometry x="20" y="40" width="150" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- Frontend Docker Container -->
+        <mxCell id="docker_front" value="&lt;b&gt;Docker Container&lt;/b&gt;&lt;br&gt;Nginx Web Server&lt;br&gt;(React static build)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F7FA;strokeColor=#00ACC1;strokeWidth=2;align=center;" vertex="1" parent="vm_front">
+          <mxGeometry x="10" y="40" width="130" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- NAT Gateway -->
+        <mxCell id="nat_gw" value="&lt;b&gt;AWS NAT Gateway&lt;/b&gt;&lt;br&gt;(Outbound Routing)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2F1;strokeColor=#009688;strokeWidth=2;align=center;" vertex="1" parent="subnet_front">
+          <mxGeometry x="185" y="40" width="120" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- Backend Subnet Group (Private) -->
+        <mxCell id="subnet_back" value="Backend Subnet (Private - 10.0.2.0/24)" style="swimlane;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#D32F2F;strokeWidth=1;fontStyle=1;align=left;spacingLeft=10;verticalAlign=top;" vertex="1" parent="vpc">
+          <mxGeometry x="380" y="50" width="310" height="200" as="geometry" />
+        </mxCell>
+        
+        <!-- Backend VM EC2 -->
+        <mxCell id="vm_back" value="&lt;b&gt;Backend VM (EC2)&lt;/b&gt;&lt;br&gt;Docker Installed" style="swimlane;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#D32F2F;strokeWidth=2;align=left;spacingLeft=10;verticalAlign=top;" vertex="1" parent="subnet_back">
+          <mxGeometry x="20" y="40" width="270" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- Backend Docker Container -->
+        <mxCell id="docker_back" value="&lt;b&gt;Docker Container&lt;/b&gt;&lt;br&gt;Node.js Express API REST server&lt;br&gt;(Port: 5000)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F7FA;strokeColor=#00ACC1;strokeWidth=2;align=center;" vertex="1" parent="vm_back">
+          <mxGeometry x="20" y="40" width="230" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Database Subnet Group (Private) -->
+        <mxCell id="subnet_db" value="Database Subnet (Private - 10.0.3.0/24)" style="swimlane;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#7B1FA2;strokeWidth=1;fontStyle=1;align=left;spacingLeft=10;verticalAlign=top;" vertex="1" parent="vpc">
+          <mxGeometry x="30" y="280" width="320" height="200" as="geometry" />
+        </mxCell>
+        
+        <!-- RDS MySQL Database -->
+        <mxCell id="rds_db" value="&lt;b&gt;AWS RDS MySQL&lt;/b&gt;&lt;br&gt;Port: 3306&lt;br&gt;(Isolated DB Instance)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#F3E5F5;strokeColor=#7B1FA2;strokeWidth=2;align=center;" vertex="1" parent="subnet_db">
+          <mxGeometry x="100" y="50" width="120" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- Cloudflare R2 Storage (External Multi-Cloud) -->
+        <mxCell id="cf_r2" value="&lt;b&gt;Cloudflare R2 Bucket&lt;/b&gt;&lt;br&gt;S3-Compatible Object Storage&lt;br&gt;(Multi-Cloud Storage)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;strokeWidth=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="720" y="820" width="180" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Client Browser -->
+        <mxCell id="client" value="&lt;b&gt;Client Browser&lt;/b&gt;&lt;br&gt;User Desktop / Mobile" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECEFF1;strokeColor=#607D8B;strokeWidth=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="440" y="40" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Cloudflare CDN & DNS -->
+        <mxCell id="cf_cdn" value="&lt;b&gt;Cloudflare CDN &amp;amp; DNS Proxy&lt;/b&gt;&lt;br&gt;Web Application Firewall (WAF)" style="cloud;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#FF9800;strokeWidth=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="400" y="140" width="220" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Google Gemini API (External AI Service) -->
+        <mxCell id="gemini_api" value="&lt;b&gt;Google Gemini API&lt;/b&gt;&lt;br&gt;LLM Cognitive Service&lt;br&gt;(External API)" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#E8EAF6;strokeColor=#3F51B5;strokeWidth=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="380" width="160" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- CONNECTIONS (Edges) -->
+        
+        <!-- Push Code: Github Repo to Github Actions -->
+        <mxCell id="edge_push" value="Git Push Event&lt;br&gt;(Trigger Pipeline)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#24292e;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="github_repo" target="github_actions">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Docker Push: Github Actions to Docker Hub -->
+        <mxCell id="edge_dock_push" value="Docker Build &amp;amp; Push" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0288D1;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="github_actions" target="docker_hub">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- SSH Deploy Trigger: Github Actions to VMs -->
+        <mxCell id="edge_ssh_front" value="SSH Deploy (Port 22)&lt;br&gt;docker-compose pull &amp;amp; restart" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#616161;strokeWidth=1.5;fontSize=10;dashed=1;" edge="1" parent="1" source="github_actions" target="vm_front">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="140" y="270" />
+              <mxPoint x="140" y="520" />
+              <mxPoint x="350" y="520" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_ssh_back" value="SSH Deploy (Port 22)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#616161;strokeWidth=1.5;fontSize=10;dashed=1;" edge="1" parent="1" source="github_actions" target="vm_back">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="100" y="270" />
+              <mxPoint x="100" y="530" />
+              <mxPoint x="740" y="530" />
+              <mxPoint x="740" y="420" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Docker Pull: Docker Hub to VMs -->
+        <mxCell id="edge_dock_pull_front" value="Docker Pull Image" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0288D1;strokeWidth=1.2;fontSize=10;" edge="1" parent="1" source="docker_hub" target="vm_front">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="100" y="470" />
+              <mxPoint x="320" y="470" />
+              <mxPoint x="320" y="400" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_dock_pull_back" value="Docker Pull Image" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0288D1;strokeWidth=1.2;fontSize=10;" edge="1" parent="1" source="docker_hub" target="vm_back">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="60" y="490" />
+              <mxPoint x="710" y="490" />
+              <mxPoint x="710" y="400" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Client to Cloudflare CDN -->
+        <mxCell id="edge1" value="HTTP/HTTPS&lt;br&gt;(Port 80/443)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#607D8B;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="client" target="cf_cdn">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Cloudflare CDN to Frontend Web App (inside VM) -->
+        <mxCell id="edge2" value="Proxied Request&lt;br&gt;(Port 80/8080)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FF9800;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="cf_cdn" target="docker_front">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="510" y="260" />
+              <mxPoint x="350" y="260" />
+              <mxPoint x="350" y="410" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Frontend React Web App to Backend API REST (inside Docker containers) -->
+        <mxCell id="edge3" value="REST API Request&lt;br&gt;(Port 5000)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E88E5;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="docker_front" target="docker_back">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="350" y="410" />
+              <mxPoint x="350" y="340" />
+              <mxPoint x="660" y="340" />
+              <mxPoint x="660" y="410" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Backend VM (Docker container) to RDS MySQL -->
+        <mxCell id="edge4" value="DB Query&lt;br&gt;(Port 3306)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D32F2F;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="docker_back" target="rds_db">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="735" y="410" />
+              <mxPoint x="735" y="520" />
+              <mxPoint x="430" y="520" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Backend VM (Docker container) to NAT Gateway -->
+        <mxCell id="edge5" value="Outbound Traffic" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#009688;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="docker_back" target="nat_gw">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="770" y="410" />
+              <mxPoint x="770" y="510" />
+              <mxPoint x="505" y="510" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- NAT Gateway to Google Gemini API -->
+        <mxCell id="edge6" value="Gemini API Call&lt;br&gt;(Port 443 HTTPS)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#009688;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="nat_gw" target="gemini_api">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="505" y="340" />
+              <mxPoint x="1000" y="340" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Backend VM (Docker container) to Cloudflare R2 -->
+        <mxCell id="edge7" value="Upload/Download S3 API&lt;br&gt;(Port 443 HTTPS)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D32F2F;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="docker_back" target="cf_r2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="770" y="410" />
+              <mxPoint x="770" y="860" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
